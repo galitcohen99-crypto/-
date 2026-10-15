@@ -1,0 +1,40 @@
+const assert = require('node:assert/strict');
+const { chromium } = require('playwright');
+(async () => {
+  const browser = await chromium.launch({ executablePath: '/usr/bin/chromium', headless: true });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1080 } });
+    const errors = []; page.on('pageerror', e => errors.push(e.message));
+    await page.goto(process.argv[2] || 'http://localhost:8001/index.html');
+    await page.waitForFunction(() => window.arenaSnapshot?.().assetsReady === 4);
+    assert.match(await page.title(), /30/);
+    await page.context().setOffline(true);
+    await page.clock.install({ time: new Date('2026-10-15T12:00:00Z') });
+    await page.clock.pauseAt(new Date('2026-10-15T12:00:01Z'));
+    await page.locator('#difficulty').selectOption('0');
+    await page.locator('#startButton').click(); await page.clock.runFor(1200);
+    assert.equal(await page.evaluate(() => window.arenaSnapshot().mode), 'playing');
+    await page.keyboard.down('ArrowRight'); await page.clock.runFor(380); await page.keyboard.up('ArrowRight');
+    await page.keyboard.down('j'); await page.clock.runFor(800); await page.keyboard.up('j');
+    assert.ok(await page.evaluate(() => window.arenaSnapshot().enemy.hp < 100), 'Punch must deal damage');
+    const hp = await page.evaluate(() => window.arenaSnapshot().enemy.hp);
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ל', code: 'KeyK', bubbles: true })));
+    await page.clock.runFor(800);
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keyup', { key: 'ל', code: 'KeyK', bubbles: true })));
+    assert.ok(await page.evaluate(before => window.arenaSnapshot().enemy.hp < before, hp), 'Hebrew kick must deal damage');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(() => window.arenaSnapshot().mode), 'paused');
+    await page.locator('#pauseButton').click();
+    assert.equal(await page.evaluate(() => window.arenaSnapshot().mode), 'playing');
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    const x = await page.evaluate(() => window.arenaSnapshot().player.x);
+    const button = page.locator('[data-key="left"]'); await button.scrollIntoViewIfNeeded();
+    const box = await button.boundingBox(); await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down(); await page.clock.runFor(250); await page.mouse.up();
+    assert.ok(await page.evaluate(before => window.arenaSnapshot().player.x < before, x), 'Pointer movement must work');
+    assert.equal(await page.locator('body').evaluate(e => /[a-z]/i.test(e.innerText)), false);
+    assert.deepEqual(errors, []);
+    console.log('PASS: extracted release, offline assets, start, keyboard, Hebrew kick, pause, mobile, pointer controls, Hebrew UI, no script errors.');
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });
