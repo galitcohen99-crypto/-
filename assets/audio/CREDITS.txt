@@ -1,0 +1,15 @@
+Audio source: 0 A.D. by Wildfire Games
+Copyright (C) 2009 Wildfire Games — https://www.wildfiregames.com/
+License: Creative Commons Attribution-ShareAlike 3.0 Unported
+https://creativecommons.org/licenses/by-sa/3.0/
+
+Originals retrieved from https://github.com/0ad/0ad/tree/master/binaries/data/mods/public/audio
+- ambient/building/amb_trade_10.ogg -> source/crowd.ogg -> crowd.mp3
+- actor/human/death/male_death_01.ogg through male_death_06.ogg
+  -> source/grunt1.ogg through source/grunt6.ogg -> grunt1.mp3 through grunt6.mp3
+
+Changes: crowd recording high/low-pass filtered, edge fades added, transcoded to mono 24kHz MP3.
+Vocal recordings shortened to brief 0.7-second reactions, trailing fade added, transcoded to mono 24kHz MP3.
+These recordings and the modified MP3 versions remain under CC BY-SA 3.0.
+The original files and original audio LICENSE.txt are preserved in source/.
+Procedural impacts, bells and synthetic crowd reactions are implemented in src/arena-sound.js.

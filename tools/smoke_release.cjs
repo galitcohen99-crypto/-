@@ -7,7 +7,7 @@ const { chromium } = require('playwright');
     const errors = []; page.on('pageerror', e => errors.push(e.message));
     await page.goto(process.argv[2] || 'http://localhost:8001/index.html');
     await page.waitForFunction(() => window.arenaSnapshot?.().assetsReady === 4);
-    assert.match(await page.title(), /31/);
+    assert.match(await page.title(), /32/);
     await page.context().setOffline(true);
     await page.clock.install({ time: new Date('2026-10-15T12:00:00Z') });
     await page.clock.pauseAt(new Date('2026-10-15T12:00:01Z'));

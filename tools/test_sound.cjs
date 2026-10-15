@@ -1,0 +1,21 @@
+const assert=require('node:assert/strict');
+const {chromium}=require('playwright');
+(async()=>{const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true});try{
+const p=await browser.newPage();const errors=[];p.on('pageerror',e=>errors.push(e.message));
+await p.goto(process.argv[2]||'http://localhost:8000/zirat_haalufim_v32.html');await p.waitForFunction(()=>window.arenaSnapshot?.().assetsReady===4);
+assert.equal(await p.evaluate(()=>arenaSnapshot().sound.state),'not-started','Do not autoplay before user starts');
+await p.locator('#startButton').click();
+await p.waitForFunction(()=>{const s=arenaSnapshot().sound;return s.state==='running'&&s.loaded===7&&s.ambientLoops===2&&s.rms>.001});
+console.log('Audible crowd',await p.evaluate(()=>arenaSnapshot().sound));
+await p.context().setOffline(true);
+await p.locator('#soundButton').click();await p.waitForTimeout(350);
+assert.equal(await p.evaluate(()=>arenaSnapshot().sound.enabled),false);assert.ok(await p.evaluate(()=>arenaSnapshot().sound.rms<.0005),'Mute must silence audio output');
+await p.locator('#soundButton').click();await p.waitForFunction(()=>arenaSnapshot().sound.rms>.001);
+await p.keyboard.down('d');await p.waitForTimeout(1900);await p.keyboard.up('d');
+await p.keyboard.down('f');await p.waitForTimeout(1800);await p.keyboard.up('f');
+await p.waitForFunction(()=>{const s=arenaSnapshot().sound;return s.counters.hits>0&&s.counters.grunts>0});
+const state=await p.evaluate(()=>arenaSnapshot().sound);assert.equal(state.error,null);console.log('Audible hit reactions',state);
+await p.locator('#pauseButton').click();await p.waitForTimeout(350);assert.ok(await p.evaluate(()=>arenaSnapshot().sound.paused&&arenaSnapshot().sound.rms<.0005),'Pause must silence crowd and effects');
+await p.locator('#pauseButton').click();await p.waitForFunction(()=>arenaSnapshot().sound.rms>.001);assert.equal(await p.evaluate(()=>arenaSnapshot().sound.ambientLoops),2,'Resume must not duplicate loops');
+assert.deepEqual(errors,[]);console.log('PASS: no autoplay, decoded samples, nonzero audible signal, crowd loops, damage grunts, full mute/unmute, pause/resume, no duplicate loops, offline audio.');
+}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});
