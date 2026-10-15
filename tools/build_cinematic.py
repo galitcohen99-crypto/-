@@ -23,11 +23,11 @@ assets={'frames':frames}
 for name,file in [('kaizer','kaizer-atlas.png'),('brute','brute-atlas.png'),('walk','walk-atlas.png'),('arena','arena.png')]:
  assets[name]='data:image/webp;base64,'+base64.b64encode((root/'assets'/Path(file).with_suffix('.webp')).read_bytes()).decode()
 s=(root/'src/cinematic.html').read_text().replace('/*STYLE*/',(root/'src/cinematic.css').read_text()).replace('/*ASSETS*/',json.dumps(assets,separators=(',',':'))).replace('/*GAME*/',(root/'src/cinematic-game.js').read_text())
-s=s.replace('<title>זירת האלופים — הקרב על התהילה</title>','<title>זירת האלופים — גרסה 30</title>').replace('הקרב על התהילה</small>','הקרב על התהילה · גרסה 30</small>').replace('מכין את המתאבקים והתאורה…','מכין את המתאבקים. אם זו תצוגה מקדימה, יש להוריד את הקובץ ולפתוח אותו בדפדפן.').replace('<body>','<body><noscript><p style="padding:20px;background:#542416;color:white">המשחק דורש דפדפן עם JavaScript פעיל. הורד את הקובץ ופתח אותו בדפדפן.</p></noscript>')
-out=root/'output/zirat_haalufim_v30.html';out.write_text(s)
+s=s.replace('<title>זירת האלופים — הקרב על התהילה</title>','<title>זירת האלופים — גרסה 31</title>').replace('הקרב על התהילה</small>','הקרב על התהילה · גרסה 31</small>').replace('מכין את המתאבקים והתאורה…','מכין את המתאבקים. אם זו תצוגה מקדימה, יש להוריד את הקובץ ולפתוח אותו בדפדפן.').replace('<body>','<body><noscript><p style="padding:20px;background:#542416;color:white">המשחק דורש דפדפן עם JavaScript פעיל. הורד את הקובץ ופתח אותו בדפדפן.</p></noscript>')
+out=root/'output/zirat_haalufim_v31.html';out.write_text(s)
 with ZipFile(out.with_suffix('.zip'),'w',ZIP_DEFLATED) as z:
  z.write(out,'index.html')
- z.writestr('READ_ME.txt','זירת האלופים — גרסה 30\n\n1. הורד את קובץ ה־ZIP למכשיר.\n2. חלץ את הקובץ (Extract all).\n3. פתח את index.html בדפדפן Chrome, Edge או Firefox.\n4. לחץ על התחל קרב.\n\nאין צורך בהתקנה או ברשת. אין להפעיל מתוך התצוגה המקדימה של הקובץ בצ׳אט.\nשליטה: חצים לתנועה וקפיצה, ח לאגרוף, ל לבעיטה, ק להטלה, ך לחסימה, ר למהלך סיום, פ להצמדה, רווח להיחלצות.\n')
+ z.writestr('READ_ME.txt','זירת האלופים — גרסה 31\n\n1. הורד את קובץ ה־ZIP למכשיר.\n2. חלץ את הקובץ (Extract all).\n3. פתח את index.html בדפדפן Chrome, Edge או Firefox.\n4. לחץ על התחל קרב.\n\nאין צורך בהתקנה או ברשת. אין להפעיל מתוך התצוגה המקדימה של הקובץ בצ׳אט.\nשליטה: ש/ג לתנועה, רווח לקפיצה או להיחלצות, כ לאגרוף, ק לבעיטה, ר להטלה, שיפט שמאלי לחסימה, ב למהלך סיום, ה להצמדה. החצים עדיין עובדים. במקלדת אנגלית: A/D לתנועה, F אגרוף, E בעיטה, R הטלה, Shift חסימה, C מהלך סיום, V הצמדה.\n')
 print(out, out.stat().st_size,'bytes')
 
 (root/'index.html').write_bytes(out.read_bytes())
